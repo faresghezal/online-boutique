@@ -5,93 +5,85 @@ on:
     branches:
       - main
 
-env:
-  ACR_NAME: boutiqueterraform123
-  RESOURCE_GROUP: rg-online-boutique
-  AKS_CLUSTER: aks-online-boutique
-  K8S_MANIFEST: ./online-boutique.yaml
-  IMAGE_TAG: latest
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    env:
+      ACR_NAME: boutiqueterraform123
+      RESOURCE_GROUP: rg-online-boutique
+      AKS_CLUSTER: aks-online-boutique
+      K8S_MANIFEST: ./online-boutique.yaml
+      IMAGE_TAG: latest
+
     steps:
+    # -------------------------
+    # Checkout repository
+    # -------------------------
     - name: Checkout repo
       uses: actions/checkout@v3
 
+    # -------------------------
+    # Login to Azure
+    # -------------------------
     - name: Login to Azure
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+    # -------------------------
+    # Get AKS credentials
+    # -------------------------
     - name: Get AKS credentials
       run: az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_CLUSTER
 
+    # -------------------------
+    # Login to Azure Container Registry
+    # -------------------------
     - name: Login to ACR
       run: az acr login --name $ACR_NAME
 
     # -------------------------
-    # Build & Push Docker Images
+    # Build & Push all Docker images
     # -------------------------
-    - name: Build & Push adservice
+    - name: Build & Push Docker Images
       run: |
-        docker build -t $ACR_NAME/adservice:$IMAGE_TAG ./microservices-demo/src/adservice
+        cd microservices-demo/src
+
+        docker build -t $ACR_NAME/adservice:$IMAGE_TAG ./adservice
         docker push $ACR_NAME/adservice:$IMAGE_TAG
 
-    - name: Build & Push shoppingassistantservice
-      run: |
-        docker build -t $ACR_NAME/shoppingassistantservice:$IMAGE_TAG ./microservices-demo/src/shoppingassistantservice
+        docker build -t $ACR_NAME/shoppingassistantservice:$IMAGE_TAG ./shoppingassistantservice
         docker push $ACR_NAME/shoppingassistantservice:$IMAGE_TAG
 
-    - name: Build & Push productcatalogservice
-      run: |
-        docker build -t $ACR_NAME/productcatalogservice:$IMAGE_TAG ./microservices-demo/src/productcatalogservice
+        docker build -t $ACR_NAME/productcatalogservice:$IMAGE_TAG ./productcatalogservice
         docker push $ACR_NAME/productcatalogservice:$IMAGE_TAG
 
-    - name: Build & Push loadgenerator
-      run: |
-        docker build -t $ACR_NAME/loadgenerator:$IMAGE_TAG ./microservices-demo/src/loadgenerator
+        docker build -t $ACR_NAME/loadgenerator:$IMAGE_TAG ./loadgenerator
         docker push $ACR_NAME/loadgenerator:$IMAGE_TAG
 
-    - name: Build & Push checkoutservice
-      run: |
-        docker build -t $ACR_NAME/checkoutservice:$IMAGE_TAG ./microservices-demo/src/checkoutservice
+        docker build -t $ACR_NAME/checkoutservice:$IMAGE_TAG ./checkoutservice
         docker push $ACR_NAME/checkoutservice:$IMAGE_TAG
 
-    - name: Build & Push frontend
-      run: |
-        docker build -t $ACR_NAME/frontend:$IMAGE_TAG ./microservices-demo/src/frontend
+        docker build -t $ACR_NAME/frontend:$IMAGE_TAG ./frontend
         docker push $ACR_NAME/frontend:$IMAGE_TAG
 
-    - name: Build & Push currencyservice
-      run: |
-        docker build -t $ACR_NAME/currencyservice:$IMAGE_TAG ./microservices-demo/src/currencyservice
+        docker build -t $ACR_NAME/currencyservice:$IMAGE_TAG ./currencyservice
         docker push $ACR_NAME/currencyservice:$IMAGE_TAG
 
-    - name: Build & Push emailservice
-      run: |
-        docker build -t $ACR_NAME/emailservice:$IMAGE_TAG ./microservices-demo/src/emailservice
+        docker build -t $ACR_NAME/emailservice:$IMAGE_TAG ./emailservice
         docker push $ACR_NAME/emailservice:$IMAGE_TAG
 
-    - name: Build & Push cartservice
-      run: |
-        docker build -t $ACR_NAME/cartservice:$IMAGE_TAG ./microservices-demo/src/cartservice/src
+        docker build -t $ACR_NAME/cartservice:$IMAGE_TAG ./cartservice/src
         docker push $ACR_NAME/cartservice:$IMAGE_TAG
 
-    - name: Build & Push recommendationservice
-      run: |
-        docker build -t $ACR_NAME/recommendationservice:$IMAGE_TAG ./microservices-demo/src/recommendationservice
+        docker build -t $ACR_NAME/recommendationservice:$IMAGE_TAG ./recommendationservice
         docker push $ACR_NAME/recommendationservice:$IMAGE_TAG
 
-    - name: Build & Push shippingservice
-      run: |
-        docker build -t $ACR_NAME/shippingservice:$IMAGE_TAG ./microservices-demo/src/shippingservice
+        docker build -t $ACR_NAME/shippingservice:$IMAGE_TAG ./shippingservice
         docker push $ACR_NAME/shippingservice:$IMAGE_TAG
 
-    - name: Build & Push paymentservice
-      run: |
-        docker build -t $ACR_NAME/paymentservice:$IMAGE_TAG ./microservices-demo/src/paymentservice
+        docker build -t $ACR_NAME/paymentservice:$IMAGE_TAG ./paymentservice
         docker push $ACR_NAME/paymentservice:$IMAGE_TAG
 
     # -------------------------
@@ -99,4 +91,4 @@ jobs:
     # -------------------------
     - name: Deploy to AKS
       run: |
-        kubectl apply -f $K8S_MANIFEST
+        kubectl apply -f ../../$K8S_MANIFEST
