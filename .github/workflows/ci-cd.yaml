@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  ACR_NAME: boutiqueterraform12345
+  ACR_NAME: boutiqueterraform123
   RESOURCE_GROUP: rg-online-boutique
   AKS_CLUSTER: aks-online-boutique
   IMAGE_TAG: ${{ github.sha }}
