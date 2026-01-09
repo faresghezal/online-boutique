@@ -1,0 +1,40 @@
+name: CI/CD Online Boutique
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  ACR_NAME: boutiqueterraform12345
+  RESOURCE_GROUP: rg-online-boutique
+  AKS_CLUSTER: aks-online-boutique
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Build and Push Docker Image
+      run: |
+        az acr login --name $ACR_NAME
+        docker build -t $ACR_NAME.azurecr.io/frontend:$IMAGE_TAG ./frontend
+        docker push $ACR_NAME.azurecr.io/frontend:$IMAGE_TAG
+
+    - name: Get AKS credentials
+      run: |
+        az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_CLUSTER
+
+    - name: Deploy to AKS
+      run: |
+        kubectl set image deployment/frontend frontend=$ACR_NAME.azurecr.io/frontend:$IMAGE_TAG -n online-boutique
+        kubectl rollout status deployment/frontend -n online-boutique
