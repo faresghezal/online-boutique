@@ -36,62 +36,62 @@ jobs:
     # -------------------------
     - name: Build & Push adservice
       run: |
-        docker build -t $ACR_NAME/adservice:$IMAGE_TAG ./src/adservice
+        docker build -t $ACR_NAME/adservice:$IMAGE_TAG ./microservices-demo/src/adservice
         docker push $ACR_NAME/adservice:$IMAGE_TAG
 
     - name: Build & Push shoppingassistantservice
       run: |
-        docker build -t $ACR_NAME/shoppingassistantservice:$IMAGE_TAG ./src/shoppingassistantservice
+        docker build -t $ACR_NAME/shoppingassistantservice:$IMAGE_TAG ./microservices-demo/src/shoppingassistantservice
         docker push $ACR_NAME/shoppingassistantservice:$IMAGE_TAG
 
     - name: Build & Push productcatalogservice
       run: |
-        docker build -t $ACR_NAME/productcatalogservice:$IMAGE_TAG ./src/productcatalogservice
+        docker build -t $ACR_NAME/productcatalogservice:$IMAGE_TAG ./microservices-demo/src/productcatalogservice
         docker push $ACR_NAME/productcatalogservice:$IMAGE_TAG
 
     - name: Build & Push loadgenerator
       run: |
-        docker build -t $ACR_NAME/loadgenerator:$IMAGE_TAG ./src/loadgenerator
+        docker build -t $ACR_NAME/loadgenerator:$IMAGE_TAG ./microservices-demo/src/loadgenerator
         docker push $ACR_NAME/loadgenerator:$IMAGE_TAG
 
     - name: Build & Push checkoutservice
       run: |
-        docker build -t $ACR_NAME/checkoutservice:$IMAGE_TAG ./src/checkoutservice
+        docker build -t $ACR_NAME/checkoutservice:$IMAGE_TAG ./microservices-demo/src/checkoutservice
         docker push $ACR_NAME/checkoutservice:$IMAGE_TAG
 
     - name: Build & Push frontend
       run: |
-        docker build -t $ACR_NAME/frontend:$IMAGE_TAG ./src/frontend
+        docker build -t $ACR_NAME/frontend:$IMAGE_TAG ./microservices-demo/src/frontend
         docker push $ACR_NAME/frontend:$IMAGE_TAG
 
     - name: Build & Push currencyservice
       run: |
-        docker build -t $ACR_NAME/currencyservice:$IMAGE_TAG ./src/currencyservice
+        docker build -t $ACR_NAME/currencyservice:$IMAGE_TAG ./microservices-demo/src/currencyservice
         docker push $ACR_NAME/currencyservice:$IMAGE_TAG
 
     - name: Build & Push emailservice
       run: |
-        docker build -t $ACR_NAME/emailservice:$IMAGE_TAG ./src/emailservice
+        docker build -t $ACR_NAME/emailservice:$IMAGE_TAG ./microservices-demo/src/emailservice
         docker push $ACR_NAME/emailservice:$IMAGE_TAG
 
     - name: Build & Push cartservice
       run: |
-        docker build -t $ACR_NAME/cartservice:$IMAGE_TAG ./src/cartservice/src
+        docker build -t $ACR_NAME/cartservice:$IMAGE_TAG ./microservices-demo/src/cartservice/src
         docker push $ACR_NAME/cartservice:$IMAGE_TAG
 
     - name: Build & Push recommendationservice
       run: |
-        docker build -t $ACR_NAME/recommendationservice:$IMAGE_TAG ./src/recommendationservice
+        docker build -t $ACR_NAME/recommendationservice:$IMAGE_TAG ./microservices-demo/src/recommendationservice
         docker push $ACR_NAME/recommendationservice:$IMAGE_TAG
 
     - name: Build & Push shippingservice
       run: |
-        docker build -t $ACR_NAME/shippingservice:$IMAGE_TAG ./src/shippingservice
+        docker build -t $ACR_NAME/shippingservice:$IMAGE_TAG ./microservices-demo/src/shippingservice
         docker push $ACR_NAME/shippingservice:$IMAGE_TAG
 
     - name: Build & Push paymentservice
       run: |
-        docker build -t $ACR_NAME/paymentservice:$IMAGE_TAG ./src/paymentservice
+        docker build -t $ACR_NAME/paymentservice:$IMAGE_TAG ./microservices-demo/src/paymentservice
         docker push $ACR_NAME/paymentservice:$IMAGE_TAG
 
     # -------------------------
