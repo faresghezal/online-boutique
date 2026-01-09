@@ -1,4 +1,4 @@
-name: CI/CD Online Boutique
+name: Build and Deploy Online Boutique
 
 on:
   push:
@@ -9,7 +9,8 @@ env:
   ACR_NAME: boutiqueterraform123
   RESOURCE_GROUP: rg-online-boutique
   AKS_CLUSTER: aks-online-boutique
-  IMAGE_TAG: ${{ github.sha }}
+  K8S_MANIFEST: ./online-boutique.yaml
+  IMAGE_TAG: latest
 
 jobs:
   build-and-deploy:
@@ -19,22 +20,86 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v3
 
-    - name: Azure Login
+    - name: Set up Azure CLI
+      uses: azure/cli@v1
+
+    - name: Login to Azure
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Build and Push Docker Image
-      run: |
-        az acr login --name $ACR_NAME
-        docker build -t $ACR_NAME.azurecr.io/frontend:$IMAGE_TAG ./frontend
-        docker push $ACR_NAME.azurecr.io/frontend:$IMAGE_TAG
-
     - name: Get AKS credentials
-      run: |
-        az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_CLUSTER
+      run: az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_CLUSTER
 
+    - name: Login to ACR
+      run: az acr login --name $ACR_NAME
+
+    # -------------------------
+    # Build & Push Docker Images
+    # -------------------------
+    - name: Build & Push adservice
+      run: |
+        docker build -t $ACR_NAME/adservice:$IMAGE_TAG ./src/adservice
+        docker push $ACR_NAME/adservice:$IMAGE_TAG
+
+    - name: Build & Push shoppingassistantservice
+      run: |
+        docker build -t $ACR_NAME/shoppingassistantservice:$IMAGE_TAG ./src/shoppingassistantservice
+        docker push $ACR_NAME/shoppingassistantservice:$IMAGE_TAG
+
+    - name: Build & Push productcatalogservice
+      run: |
+        docker build -t $ACR_NAME/productcatalogservice:$IMAGE_TAG ./src/productcatalogservice
+        docker push $ACR_NAME/productcatalogservice:$IMAGE_TAG
+
+    - name: Build & Push loadgenerator
+      run: |
+        docker build -t $ACR_NAME/loadgenerator:$IMAGE_TAG ./src/loadgenerator
+        docker push $ACR_NAME/loadgenerator:$IMAGE_TAG
+
+    - name: Build & Push checkoutservice
+      run: |
+        docker build -t $ACR_NAME/checkoutservice:$IMAGE_TAG ./src/checkoutservice
+        docker push $ACR_NAME/checkoutservice:$IMAGE_TAG
+
+    - name: Build & Push frontend
+      run: |
+        docker build -t $ACR_NAME/frontend:$IMAGE_TAG ./src/frontend
+        docker push $ACR_NAME/frontend:$IMAGE_TAG
+
+    - name: Build & Push currencyservice
+      run: |
+        docker build -t $ACR_NAME/currencyservice:$IMAGE_TAG ./src/currencyservice
+        docker push $ACR_NAME/currencyservice:$IMAGE_TAG
+
+    - name: Build & Push emailservice
+      run: |
+        docker build -t $ACR_NAME/emailservice:$IMAGE_TAG ./src/emailservice
+        docker push $ACR_NAME/emailservice:$IMAGE_TAG
+
+    - name: Build & Push cartservice
+      run: |
+        docker build -t $ACR_NAME/cartservice:$IMAGE_TAG ./src/cartservice/src
+        docker push $ACR_NAME/cartservice:$IMAGE_TAG
+
+    - name: Build & Push recommendationservice
+      run: |
+        docker build -t $ACR_NAME/recommendationservice:$IMAGE_TAG ./src/recommendationservice
+        docker push $ACR_NAME/recommendationservice:$IMAGE_TAG
+
+    - name: Build & Push shippingservice
+      run: |
+        docker build -t $ACR_NAME/shippingservice:$IMAGE_TAG ./src/shippingservice
+        docker push $ACR_NAME/shippingservice:$IMAGE_TAG
+
+    - name: Build & Push paymentservice
+      run: |
+        docker build -t $ACR_NAME/paymentservice:$IMAGE_TAG ./src/paymentservice
+        docker push $ACR_NAME/paymentservice:$IMAGE_TAG
+
+    # -------------------------
+    # Deploy to AKS
+    # -------------------------
     - name: Deploy to AKS
       run: |
-        kubectl set image deployment/frontend frontend=$ACR_NAME.azurecr.io/frontend:$IMAGE_TAG -n online-boutique
-        kubectl rollout status deployment/frontend -n online-boutique
+        kubectl apply -f $K8S_MANIFEST
