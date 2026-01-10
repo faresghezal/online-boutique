@@ -37,4 +37,3 @@ jobs:
     # -------------------------
     - name: Deploy to AKS
       run: |
-        kubectl apply -f ../../$K8S_MANIFEST
