@@ -17,74 +17,20 @@ jobs:
       IMAGE_TAG: latest
 
     steps:
-    # -------------------------
-    # Checkout repository
-    # -------------------------
     - name: Checkout repo
       uses: actions/checkout@v3
 
-    # -------------------------
-    # Login to Azure
-    # -------------------------
     - name: Login to Azure
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    # -------------------------
-    # Get AKS credentials
-    # -------------------------
     - name: Get AKS credentials
       run: az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_CLUSTER
 
-    # -------------------------
-    # Login to Azure Container Registry
-    # -------------------------
+
     - name: Login to ACR
       run: az acr login --name $ACR_NAME
-
-    # -------------------------
-    # Build & Push all Docker images
-    # -------------------------
-    - name: Build & Push Docker Images
-      run: |
-        cd microservices-demo/src
-
-        docker build -t $ACR_NAME/adservice:$IMAGE_TAG ./adservice
-        docker push $ACR_NAME/adservice:$IMAGE_TAG
-
-        docker build -t $ACR_NAME/shoppingassistantservice:$IMAGE_TAG ./shoppingassistantservice
-        docker push $ACR_NAME/shoppingassistantservice:$IMAGE_TAG
-
-        docker build -t $ACR_NAME/productcatalogservice:$IMAGE_TAG ./productcatalogservice
-        docker push $ACR_NAME/productcatalogservice:$IMAGE_TAG
-
-        docker build -t $ACR_NAME/loadgenerator:$IMAGE_TAG ./loadgenerator
-        docker push $ACR_NAME/loadgenerator:$IMAGE_TAG
-
-        docker build -t $ACR_NAME/checkoutservice:$IMAGE_TAG ./checkoutservice
-        docker push $ACR_NAME/checkoutservice:$IMAGE_TAG
-
-        docker build -t $ACR_NAME/frontend:$IMAGE_TAG ./frontend
-        docker push $ACR_NAME/frontend:$IMAGE_TAG
-
-        docker build -t $ACR_NAME/currencyservice:$IMAGE_TAG ./currencyservice
-        docker push $ACR_NAME/currencyservice:$IMAGE_TAG
-
-        docker build -t $ACR_NAME/emailservice:$IMAGE_TAG ./emailservice
-        docker push $ACR_NAME/emailservice:$IMAGE_TAG
-
-        docker build -t $ACR_NAME/cartservice:$IMAGE_TAG ./cartservice/src
-        docker push $ACR_NAME/cartservice:$IMAGE_TAG
-
-        docker build -t $ACR_NAME/recommendationservice:$IMAGE_TAG ./recommendationservice
-        docker push $ACR_NAME/recommendationservice:$IMAGE_TAG
-
-        docker build -t $ACR_NAME/shippingservice:$IMAGE_TAG ./shippingservice
-        docker push $ACR_NAME/shippingservice:$IMAGE_TAG
-
-        docker build -t $ACR_NAME/paymentservice:$IMAGE_TAG ./paymentservice
-        docker push $ACR_NAME/paymentservice:$IMAGE_TAG
 
     # -------------------------
     # Deploy to AKS
